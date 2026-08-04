@@ -1,7 +1,0 @@
-FROM node:24-slim
-
-WORKDIR /mydir
-
-EXPOSE 5173
-
-ENTRYPOINT ["sh"]
