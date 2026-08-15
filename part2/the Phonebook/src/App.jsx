@@ -1,15 +1,52 @@
 import { useState } from 'react'
 
+const PersonForm = ({addContact, newName, newNumber,handleNameChange,handleNumberChange}) => {
+
+  return(
+  <>
+    <h2>Add new</h2>
+    <form onSubmit = {addContact}>
+      <div>
+        name: <input value={newName} onChange={handleNameChange}/>
+      </div>
+      <div>
+        number: <input value={newNumber} onChange={handleNumberChange} />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
+  </>
+  )
+}
+
+const Filter = ({findName, handleFindChange}) => {
+  return (
+    <div>
+        filter shown with: 
+        <input value = {findName} onChange={handleFindChange}/>
+    </div>
+  )
+}
+
 const Numbers = ({ persons, findName }) => {
-    console.log(persons)
-    console.log(findName)
+
     if(findName === ''){
       return persons.map( person => <li key={person.id}>{person.name} {person.number}</li>)
     }
-
     return persons.filter(person => person.name.toLowerCase().includes(findName)).map( person => <li key={person.name}>{person.name} {person.number}</li>)
-        
-      
+}
+
+const DisplayNumbers = ({persons, findName}) => {
+
+  return (
+    <>
+    <h2>Numbers</h2>
+    <ul>
+      <Numbers persons={persons} findName={findName}/>
+    </ul>
+    </>
+  )
 }
 
 const App = () => {
@@ -53,26 +90,9 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <div>
-        filter shown with: 
-        <input value = {findName} onChange={handleFindChange}/>
-      </div>
-      <h2>Add new</h2>
-      <form onSubmit = {addContact}>
-        <div>
-          name: <input value={newName} onChange={handleNameChange}/>
-        </div>
-        <div>
-          number: <input value={newNumber} onChange={handleNumberChange} />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
-      <h2>Numbers</h2>
-       <ul>
-        <Numbers persons={persons} findName={findName}/>
-       </ul>
+      <Filter findName={findName} handleFindChange={handleFindChange}/>
+      <PersonForm addContact = {addContact} newName = {newName} newNumber = {newNumber} handleNameChange = {handleNameChange} handleNumberChange={handleNumberChange}/>
+      <DisplayNumbers persons={persons} findName={findName}/>
     </div>
   )
 }
