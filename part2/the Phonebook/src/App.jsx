@@ -91,10 +91,21 @@ const App = () => {
         number: newNumber/*,
         id: persons.length +1*/}
 
-    if(persons.find(person => person.name === personObject.name) !== undefined){
+    const personToUpdateNumber = persons.find(person => person.name === personObject.name)
+    if(personToUpdateNumber !== undefined){
       //Template literals (Template strings)
-      window.alert(`${personObject.name} is already added to phonebook`)
-      console.log("same name in list")
+      if(window.confirm(`${personObject.name} is already added to phonebook, do you wish do replace the old number with a new one?`)){
+        personService.update(personToUpdateNumber.id, personObject)
+          .then(returnedPerson => { 
+            setPersons(persons.map( person => person.id === personToUpdateNumber.id ? returnedPerson : person))
+            setNewName('')
+            setNewNumber('')
+        })
+        console.log("name updated")
+      }else{
+        console.log("same name in list")
+      }
+      
     }else{
       personService.create(personObject)
         .then(returnedPerson => {
@@ -111,10 +122,19 @@ const App = () => {
   }
 
   const deleteName = (id) => {
+
+    
     const personObject = persons.find(person => person.id === id)
     const indexToBeDeleted = persons.findIndex( (deletingPerson) => deletingPerson === personObject)
+    if(window.confirm(`Delete ${personObject.name}?`)){
     personService.remove(id)
-      .then(deletedPerson => setPersons(persons.toSpliced(indexToBeDeleted,1)))
+      .then(deletedPerson => setPersons(persons.toSpliced(indexToBeDeleted,1)))  
+    }
+    
+  }
+
+  const updateNumber = ({personObject}) =>{
+
   }
 
   const handleNameChange = (event) => {
