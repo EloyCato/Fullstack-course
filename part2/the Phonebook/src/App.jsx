@@ -31,21 +31,36 @@ const Filter = ({findName, handleFindChange}) => {
   )
 }
 
-const Numbers = ({ persons, findName }) => {
+const Numbers = ({ persons, findName, deleteName }) => {
 
     if(findName === ''){
-      return persons.map( person => <li key={person.id}>{person.name} {person.number}</li>)
+      return persons.map( person => 
+        <li key={person.id}>
+          {person.name} {person.number}
+          <ActionButton label={'delete'} action={() => deleteName(person.id)}/>
+        </li>)
     }
-    return persons.filter(person => person.name.toLowerCase().includes(findName)).map( person => <li key={person.name}>{person.name} {person.number}</li>)
+    return persons
+            .filter(person => person.name.toLowerCase().includes(findName))
+            .map( person => <li key={person.name}>{person.name} {person.number}<ActionButton label={'delete'} action={() => deleteName(person.id)}/></li>)
 }
 
-const DisplayNumbers = ({persons, findName}) => {
+const ActionButton = ({label, action}) => {
+
+  return(
+    <>
+    <button onClick ={action}>{label}</button>
+    </>
+  )
+}
+
+const DisplayNumbers = ({persons, findName, deleteName}) => {
 
   return (
     <>
     <h2>Numbers</h2>
     <ul>
-      <Numbers persons={persons} findName={findName}/>
+      <Numbers persons={persons} findName={findName} deleteName={deleteName}/>
     </ul>
     </>
   )
@@ -57,7 +72,7 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [findName, setFindName] = useState('')
 
- const hook = () => {
+  const hook = () => {
   console.log('effect')
   personService
     .getAll()
@@ -95,6 +110,13 @@ const App = () => {
     }
   }
 
+  const deleteName = (id) => {
+    const personObject = persons.find(person => person.id === id)
+    const indexToBeDeleted = persons.findIndex( (deletingPerson) => deletingPerson === personObject)
+    personService.remove(id)
+      .then(deletedPerson => setPersons(persons.toSpliced(indexToBeDeleted,1)))
+  }
+
   const handleNameChange = (event) => {
     setNewName(event.target.value)
   }
@@ -112,7 +134,7 @@ const App = () => {
       <h2>Phonebook</h2>
       <Filter findName={findName} handleFindChange={handleFindChange}/>
       <PersonForm addContact = {addContact} newName = {newName} newNumber = {newNumber} handleNameChange = {handleNameChange} handleNumberChange={handleNumberChange}/>
-      <DisplayNumbers persons={persons} findName={findName}/>
+      <DisplayNumbers persons={persons} findName={findName} deleteName={deleteName}/>
     </div>
   )
 }
