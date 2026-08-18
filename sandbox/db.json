@@ -3,12 +3,12 @@
     {
       "id": "1",
       "content": "HTML is easy",
-      "important": true
+      "important": false
     },
     {
       "id": "2",
       "content": "Browser can execute only JavaScript",
-      "important": false
+      "important": true
     },
     {
       "id": "3",
@@ -17,17 +17,17 @@
     },
     {
       "content": "a new note...",
-      "important": false,
+      "important": true,
       "id": "UAWQd_2YUnM"
     },
     {
       "content": "a new notea",
-      "important": false,
+      "important": true,
       "id": "20DY9ke0BNI"
     },
     {
       "content": "asdds",
-      "important": false,
+      "important": true,
       "id": "KezY2J4PUGw"
     }
   ],

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
 import personService from './services/persons'
+import Notification from './components/Notification'
 
 const PersonForm = ({addContact, newName, newNumber,handleNameChange,handleNumberChange}) => {
 
@@ -71,6 +72,7 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [findName, setFindName] = useState('')
+  const [message,setMessage] = useState(null)
 
   const hook = () => {
   console.log('effect')
@@ -110,6 +112,10 @@ const App = () => {
       personService.create(personObject)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
+          setMessage(`Added ${personObject.name}`)
+          setTimeout(() => {
+            setMessage(null)
+          },5000)
           setNewName('')
           setNewNumber('')
         })
@@ -152,6 +158,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message = {message}/>
       <Filter findName={findName} handleFindChange={handleFindChange}/>
       <PersonForm addContact = {addContact} newName = {newName} newNumber = {newNumber} handleNameChange = {handleNameChange} handleNumberChange={handleNumberChange}/>
       <DisplayNumbers persons={persons} findName={findName} deleteName={deleteName}/>
