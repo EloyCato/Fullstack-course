@@ -73,6 +73,29 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
   const [findName, setFindName] = useState('')
   const [message,setMessage] = useState(null)
+  const [style,setStyle] = useState(undefined)
+
+  const addNotification = {
+    color:'green',
+    background:'lightgrey',
+    fontSize:'25px',
+    fontWeight:'bold',
+    borderStyle:'solid',
+    borderRadius:'10px',
+    padding:'10px',
+    marginBotton:'10px'
+  }
+
+  const errorNotification = {
+    color:'red',
+    background:'lightgrey',
+    fontSize:'25px',
+    fontWeight:'bold',
+    borderStyle:'solid',
+    borderRadius:'10px',
+    padding:'10px',
+    marginBotton:'10px'
+  }
 
   const hook = () => {
   console.log('effect')
@@ -102,6 +125,12 @@ const App = () => {
             setPersons(persons.map( person => person.id === personToUpdateNumber.id ? returnedPerson : person))
             setNewName('')
             setNewNumber('')
+        }).catch(error =>{
+          setStyle(errorNotification)
+          setMessage(`Information of ${personObject.name} has already been removed from server`)
+          setTimeout(()=>{ 
+            setMessage(null)  
+          },5000)
         })
         console.log("name updated")
       }else{
@@ -112,6 +141,7 @@ const App = () => {
       personService.create(personObject)
         .then(returnedPerson => {
           setPersons(persons.concat(returnedPerson))
+          setStyle(addNotification)
           setMessage(`Added ${personObject.name}`)
           setTimeout(() => {
             setMessage(null)
@@ -158,7 +188,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message = {message}/>
+      <Notification message = {message} notificationStyle={style}/>
       <Filter findName={findName} handleFindChange={handleFindChange}/>
       <PersonForm addContact = {addContact} newName = {newName} newNumber = {newNumber} handleNameChange = {handleNameChange} handleNumberChange={handleNumberChange}/>
       <DisplayNumbers persons={persons} findName={findName} deleteName={deleteName}/>
