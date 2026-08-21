@@ -12,7 +12,8 @@ const App = () => {
   const [newNote,setNewNote] = useState('a new note...')
   const [showAll, setShowAll] = useState(true)
   const [errorMessage, setErrorMessage] = useState(null)
- const hook = () => {
+ 
+  const hook = () => {
   console.log('effect')
   noteService
     .getAll()
