@@ -2,41 +2,55 @@ import { useEffect, useState } from 'react'
 import countryService from './services/country'
 import axios from 'axios'
 
-  const FilteredCountries = ({country}) =>{
+  const FilteredCountries = ({country, handleShowingCountry}) =>{
 
     return(
       <>
-        <li> {country.name.common} </li>
+        <li> {country.name.common}
+          <button onClick = {() => handleShowingCountry(country)}>Show</button>
+        </li>
       </>
     )
   }
 
-  const DisplayCountries = ({ countries, findName }) => {
-    //const countriesToDisplay = countries.filter(country => country.name.common.toLowerCase().includes(findName))
-    const countriesToDisplay = countries.filter(country => country.name.common.includes(findName))
-    if(countriesToDisplay.length === 1){
-      //countriesToDisplay[0].languages.forEach(language => console.log(language))
-      //console.log(countriesToDisplay[0].languages)
-      const languages = Object.values(countriesToDisplay[0].languages)
-      //languages.map(lang => console.log(lang))
-      console.log(countriesToDisplay[0].flags['svg'])
-      return(
-        <>
-        <h1> {countriesToDisplay[0].name.common} </h1>
-        <li>Capital: {countriesToDisplay[0].capital[0]}</li>
-        <li> Area: {countriesToDisplay[0].area}</li>
+  const ShowCountry = ({country}) => {
+    const languages = Object.values(country.languages)
+    const capitals = Object.values(country.capital).toString()
+
+    return(
+      <>
+        <h1> {country.name.common} </h1>
+        <li>Capital: {capitals}</li>
+        <li> Area: {country.area}</li>
         <h2>Languages</h2>
         <ul>
           {languages.map(lang => <li key={lang}>{lang}</li>)
           }
         </ul>
-        <img src={countriesToDisplay[0].flags['png']}/>
-        </>
+        <img src={country.flags['png']}/>
+      </>
+    )    
+  }
+
+  const DisplayCountries = ({ countries, findName, showingCountry, handleShowingCountry}) => {
+    const countriesToDisplay = countries.filter(country => country.name.common.toLowerCase().includes(findName.toLowerCase()))
+    //const countriesToDisplay = countries.filter(country => country.name.common.includes(findName))
+    if(countriesToDisplay.length === 1){
+
+      console.log(countriesToDisplay[0].flags['svg'])
+      return(
+        <ShowCountry country = {countriesToDisplay[0]}/>
       )
-    }else if(countriesToDisplay.length <= 10){
+    }else if(countriesToDisplay.length <= 10){      
+      if(showingCountry !== ''){
+        return(
+          <ShowCountry country = {showingCountry}/>
+        )
+      }
+
       return(
         <p>
-        {countriesToDisplay.map(country => <FilteredCountries key ={country.cca3} country={country}/>)}
+        {countriesToDisplay.map(country => <FilteredCountries key={country.cca3} country={country} handleShowingCountry = {handleShowingCountry}  />)}        
         </p>
       )
     }else{
@@ -52,6 +66,7 @@ function App() {
   const [count, setCount] = useState(0)
   const [countries, setCountries ] = useState([])
   const [findName, setFindName] = useState('')
+  const [showingCountry, setShowingCountry] = useState('')
 
   const countriesHook = () => {
     countryService.getAll().then( countryData => { setCountries(countryData)})
@@ -59,9 +74,15 @@ function App() {
 
   useEffect(countriesHook,[])
   console.log(countries)
+  
   const handleFindChange = (event) =>{
     //console.log(event.target.value)
     setFindName(event.target.value)
+    setShowingCountry('')
+  }
+
+  const handleShowingCountry = (country) =>{
+    setShowingCountry(country)
   }
 
   
@@ -70,7 +91,7 @@ function App() {
     <div>
       find countries:
       <input value = {findName} onChange = {handleFindChange}/>
-      <DisplayCountries countries = {countries} findName = {findName}/>
+      <DisplayCountries countries = {countries} findName = {findName} showingCountry = {showingCountry} handleShowingCountry ={handleShowingCountry}/>
     </div>
 
   )
