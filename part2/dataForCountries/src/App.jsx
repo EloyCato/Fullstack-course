@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import countryService from './services/country'
+import weatherService from './services/weather'
 import axios from 'axios'
 
   const FilteredCountries = ({country, handleShowingCountry}) =>{
@@ -13,14 +14,37 @@ import axios from 'axios'
     )
   }
 
+  const CapitalsWeather = ({capital,lat,lng}) => {
+    const [weatherData,setWeatherData] = useState('')
+
+    const handleWeather = () =>{
+      weatherService.getCapitalWeather({lat: lat, lng: lng}).then(response => setWeatherData(response))
+    } 
+
+    if(weatherData !== ''){
+      const iconAddress = `https://openweathermap.org/payload/api/media/file/${weatherData.weather[0].icon}.png`
+      console.log(iconAddress)
+      return(
+        <>
+          <h2>Weather in {capital.toString()} </h2>
+          <li>Temperature: {weatherData.main.temp} Celsius</li>
+          <img src ={iconAddress}/>
+          <li>Wind: {weatherData.wind.speed} m/s</li>
+        </>
+      )
+    }else{
+      handleWeather()
+    }
+  }
+
   const ShowCountry = ({country}) => {
     const languages = Object.values(country.languages)
-    const capitals = Object.values(country.capital).toString()
+    const capitals = Object.values(country.capital)
 
     return(
       <>
         <h1> {country.name.common} </h1>
-        <li>Capital: {capitals}</li>
+        <li>Capital: {capitals.toString()}</li>
         <li> Area: {country.area}</li>
         <h2>Languages</h2>
         <ul>
@@ -28,6 +52,7 @@ import axios from 'axios'
           }
         </ul>
         <img src={country.flags['png']}/>
+        <CapitalsWeather capital={capitals[0]} lat={country.capitalInfo.latlng[0]} lng={country.capitalInfo.latlng[1]}/>
       </>
     )    
   }
@@ -68,12 +93,12 @@ function App() {
   const [findName, setFindName] = useState('')
   const [showingCountry, setShowingCountry] = useState('')
 
+
   const countriesHook = () => {
     countryService.getAll().then( countryData => { setCountries(countryData)})
   }
 
   useEffect(countriesHook,[])
-  console.log(countries)
   
   const handleFindChange = (event) =>{
     //console.log(event.target.value)
@@ -84,8 +109,6 @@ function App() {
   const handleShowingCountry = (country) =>{
     setShowingCountry(country)
   }
-
-  
 
   return (
     <div>
