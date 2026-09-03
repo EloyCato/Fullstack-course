@@ -1,0 +1,23 @@
+info:
+  name: postNote
+  type: http
+  seq: 1
+
+http:
+  method: POST
+  url: http://localhost:3001/api/notes
+  body:
+    type: json
+    data: |-
+      {
+        "content": "adis abeba",
+        "important": true
+      }
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5
+​
