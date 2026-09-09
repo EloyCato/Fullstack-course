@@ -1,5 +1,6 @@
 const express = require('express')
 const morgan = require('morgan')
+const Person = require('./models/person')
 
 let db = [
     { 
@@ -37,7 +38,8 @@ morgan.token('content', (request,response) =>{
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
 
 app.get('/api/persons', (request, response) => {
-  response.json(db)
+  Person.find({}).then(person => {
+    response.json(person)})
 })
 
 app.get('/info', (request, response) => {
@@ -46,12 +48,17 @@ app.get('/info', (request, response) => {
 
 app.get('/api/persons/:id', (request, response) => {
     const id = request.params.id
-    const person = db.find( p => p.id === id)
+    const person = Person.findById(request.params.id)
+        .then( person => {
+        response.json(person)
+    })
+    /*
     if(person){
         response.json(person)
     }else{
         response.status(404).end()
     }
+    */
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -72,33 +79,34 @@ const checkNumber = (number) => {
 app.post ('/api/persons', (request, response) => {
     const body = request.body
 
-    const person = {
-        name: body.name,
-        number: body.number,
-        id : Math.floor(Math.random() * 100)
-    }
-
-    if(!person.name){
+    if(!body.name){
         return( response.status(400).json({
             error: 'name missing'
         }))
     }
 
-    if(!person.number){
+    if(!body.number){
         return( response.status(400).json({
             error: 'number missing'
         }))
     }
 
-    if(checkName(person.name)){
+    /*
+    if(checkName(body.name)){
         return( response.status(400).json({
             error: 'name must be unique'
         }))
     }
+    */
 
-    db = db.concat(person)
+    const newPerson = new Person ({
+        name: body.name,
+        number: body.number,
+    })
 
-    response.json(person)
+    newPerson.save().then(person => {
+        response.json(person)
+    })
 })
 
 const PORT = process.env.PORT || 3001
