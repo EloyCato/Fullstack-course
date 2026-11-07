@@ -58,9 +58,14 @@ app.get('/info', (request, response) => {
 app.get('/api/persons/:id', (request, response) => {
     const id = request.params.id
     const person = Person.findById(request.params.id)
-        .then( person => {
-        response.json(person)
-    })
+        .then( person => { 
+            if(person){
+                response.json(person)
+            }else{
+                response.status(404).end()
+            }
+        })
+        .catch(error => next(error))
     /*
     if(person){
         response.json(person)
@@ -115,8 +120,28 @@ app.post ('/api/persons', (request, response) => {
     })
 
     newPerson.save().then(person => {
+
         response.json(person)
     })
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+  const {name, number} = request.body
+  Person.findById(request.params.id)
+    .then(person => {
+        console.log('Person Id:', request.params.id)
+        if(!person){    
+            return response.status(404).end()
+        }
+
+        person.name = name
+        person.number = number
+
+        return person.save().then((updatePerson) => {
+            response.json(updatePerson)
+        })
+    })
+    .catch(error => next(error))
 })
 
 

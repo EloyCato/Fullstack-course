@@ -5,7 +5,7 @@ info:
 
 http:
   method: GET
-  url: http://localhost:3001/api/notes/1
+  url: http://localhost:3001/api/notes/6aa07330dfd35a0212e2fc1f
   auth: inherit
 
 settings:
@@ -13,4 +13,3 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
-​
