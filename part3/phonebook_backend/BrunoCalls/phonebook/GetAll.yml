@@ -1,0 +1,14 @@
+info:
+  name: GetAll
+  type: http
+
+http:
+  method: GET
+  url: http://localhost:3001/api/persons/
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

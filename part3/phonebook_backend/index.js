@@ -27,9 +27,18 @@ let db = [
 
 const app = express()
 
-app.use(express.json())
+const requestLogger = (request, response, next) => {
+  console.log('Method:', request.method)
+  console.log('Path:  ', request.path)
+  console.log('Body:  ', request.body)
+  console.log('---')
+  next()
+}
 
+
+app.use(express.json())
 app.use(express.static('dist'))
+app.use(requestLogger)
 
 morgan.token('content', (request,response) =>{
     return JSON.stringify(request.body)
@@ -61,11 +70,12 @@ app.get('/api/persons/:id', (request, response) => {
     */
 })
 
-app.delete('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    db = db.filter( p => p.id !== id)
-    
-    response.status(204).end()
+app.delete('/api/persons/:id', (request, response, next) => {
+    Person.findByIdAndDelete(request.params.id)
+    .then(result =>{
+      response.status(204).end()
+    })
+    .catch(error => next(error))
 })
 
 const checkName = (name) => {
@@ -108,6 +118,26 @@ app.post ('/api/persons', (request, response) => {
         response.json(person)
     })
 })
+
+
+//error handling
+const unknownEndpoint = (request, response) => {
+  response.status(404).send({error: 'Unknown endpoint'})
+}
+
+app.use(unknownEndpoint)
+
+const errorHandler = (error, request, response, next) =>{
+  console.error(error.message)
+
+  if(error.name == 'CastError'){
+    return response.status(400).send({error: 'malformatted Id ' })
+  }
+
+  next(error)
+}
+
+app.use(errorHandler)
 
 const PORT = process.env.PORT || 3001
 app.listen(PORT, () => {
