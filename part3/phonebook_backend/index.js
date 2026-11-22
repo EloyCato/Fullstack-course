@@ -2,29 +2,6 @@ const express = require('express')
 const morgan = require('morgan')
 const Person = require('./models/person')
 
-let db = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
-
 const app = express()
 
 const requestLogger = (request, response, next) => {
@@ -41,7 +18,7 @@ app.use(express.static('dist'))
 app.use(requestLogger)
 
 morgan.token('content', (request,response) =>{
-    return JSON.stringify(request.body)
+  return JSON.stringify(request.body)
 })
 
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :content'))
@@ -55,18 +32,18 @@ app.get('/info', (request, response) => {
   response.send(`<ul> Phonebook has info for ${db.length} people</ul> <ul>${new Date()}</ul>`)
 })
 
-app.get('/api/persons/:id', (request, response) => {
-    const id = request.params.id
-    const person = Person.findById(request.params.id)
-        .then( person => { 
-            if(person){
-                response.json(person)
-            }else{
-                response.status(404).end()
-            }
-        })
-        .catch(error => next(error))
-    /*
+app.get('/api/persons/:id', (request, response, next) => {
+  //const id = request.params.id
+  const person = Person.findById(request.params.id)
+    .then( person => { 
+      if(person){
+        response.json(person)
+      }else{
+        response.status(404).end()
+      }
+    })
+    .catch(error => next(error))
+  /*
     if(person){
         response.json(person)
     }else{
@@ -76,24 +53,17 @@ app.get('/api/persons/:id', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
-    Person.findByIdAndDelete(request.params.id)
+  Person.findByIdAndDelete(request.params.id)
     .then(result =>{
       response.status(204).end()
     })
     .catch(error => next(error))
 })
 
-const checkName = (name) => {
-    return db.find( person => person.name === name )
-}
+app.post ('/api/persons', (request, response, next) => {
+  const body = request.body
 
-const checkNumber = (number) => {
-    return db.find(person => person.number === number)
-}
-
-app.post ('/api/persons', (request, response) => {
-    const body = request.body
-
+  /*
     if(!body.name){
         return( response.status(400).json({
             error: 'name missing'
@@ -105,8 +75,7 @@ app.post ('/api/persons', (request, response) => {
             error: 'number missing'
         }))
     }
-
-    /*
+   
     if(checkName(body.name)){
         return( response.status(400).json({
             error: 'name must be unique'
@@ -114,32 +83,32 @@ app.post ('/api/persons', (request, response) => {
     }
     */
 
-    const newPerson = new Person ({
-        name: body.name,
-        number: body.number,
-    })
+  const newPerson = new Person ({
+    name: body.name,
+    number: body.number,
+  })
 
-    newPerson.save().then(person => {
-
-        response.json(person)
-    })
+  newPerson.save().then(person => {
+    response.json(person)
+  })
+    .catch(error => next(error))
 })
 
 app.put('/api/persons/:id', (request, response, next) => {
   const {name, number} = request.body
   Person.findById(request.params.id)
     .then(person => {
-        console.log('Person Id:', request.params.id)
-        if(!person){    
-            return response.status(404).end()
-        }
+      console.log('Person Id:', request.params.id)
+      if(!person){    
+        return response.status(404).end()
+      }
 
-        person.name = name
-        person.number = number
+      person.name = name
+      person.number = number
 
-        return person.save().then((updatePerson) => {
-            response.json(updatePerson)
-        })
+      return person.save().then((updatePerson) => {
+        response.json(updatePerson)
+      })
     })
     .catch(error => next(error))
 })
@@ -155,8 +124,10 @@ app.use(unknownEndpoint)
 const errorHandler = (error, request, response, next) =>{
   console.error(error.message)
 
-  if(error.name == 'CastError'){
+  if(error.name === 'CastError'){
     return response.status(400).send({error: 'malformatted Id ' })
+  } else if(error.name === 'ValidationError'){
+    return response.status(400).json({ error: error.message })
   }
 
   next(error)

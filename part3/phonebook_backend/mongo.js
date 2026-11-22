@@ -27,25 +27,25 @@ const personSchema = new mongoose.Schema({
 const Person = mongoose.model('Person', personSchema)
 
 if(process.argv[3] && process.argv[4]){
-    const person = new Person({
+  const person = new Person({
     name: personName,
     number: personNumber,
-    })
-    person.save().then(result => {
-        console.log('person saved!')
-        console.log(result)
-        mongoose.connection.close()
-    })
+  })
+  person.save().then(result => {
+    console.log('person saved!')
+    console.log(result)
+    mongoose.connection.close()
+  })
 }
 
 if(!process.argv[3] && !process.argv[4]){
-    Person.find({}).then(result => {
-        console.log("phonebook: ")
-        result.forEach(person => {
-        //console.log(person)
-        console.log(person.name," ", person.number)
-        })
-    mongoose.connection.close()
+  Person.find({}).then(result => {
+    console.log('phonebook: ')
+    result.forEach(person => {
+      //console.log(person)
+      console.log(person.name,' ', person.number)
     })
+    mongoose.connection.close()
+  })
 }
 

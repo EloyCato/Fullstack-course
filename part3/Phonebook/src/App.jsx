@@ -148,6 +148,12 @@ const App = () => {
           },5000)
           setNewName('')
           setNewNumber('')
+        }).catch(error => {
+          setStyle(errorNotification)
+          setMessage(error.response.data.error)
+          setTimeout(()=>{ 
+            setMessage(null)  
+          },5000)
         })
       /*
         setPersons(persons.concat(personObject))

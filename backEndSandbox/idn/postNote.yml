@@ -10,8 +10,8 @@ http:
     type: json
     data: |-
       {
-        "content": "adis abeba",
-        "important": true
+        "content": "ii",
+        "important": false
       }
   auth: inherit
 
@@ -20,4 +20,3 @@ settings:
   timeout: 0
   followRedirects: true
   maxRedirects: 5
-​
